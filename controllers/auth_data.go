@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"freelancertest/models"
 	"freelancertest/services/auth"
+	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
 
@@ -12,6 +14,14 @@ import (
 func QueryAuthSubsDataHandlerFunc(params auth_data.QueryAuthSubsDataParams) middleware.Responder {
 
 	service := auth.NewAuthenticationSubscriptionService()
+	if service == nil {
+		return auth_data.NewQueryAuthSubsDataDefault(http.StatusInternalServerError).
+			WithPayload(models.ProblemDetails{
+				Code:   "Server not responding",
+				Detail: "failed to connect",
+				Status: http.StatusInternalServerError,
+			})
+	}
 
 	payload, problem := service.AuthenticationSubscriptionSearch(params.UeID)
 	if problem != nil {

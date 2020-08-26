@@ -4,14 +4,14 @@ package restapi
 
 import (
 	"crypto/tls"
+	"freelancertest/controllers"
+	"log"
 	"net/http"
-
-	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/runtime/middleware"
 
 	"freelancertest/restapi/operations"
 	"freelancertest/restapi/operations/auth_data"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 )
 
 //go:generate swagger generate server --target ..\..\freelancer --name API --spec ..\swagger.yaml --principal interface{}
@@ -28,7 +28,7 @@ func configureAPI(api *operations.APIAPI) http.Handler {
 	// Expected interface func(string, ...interface{})
 	//
 	// Example:
-	// api.Logger = log.Printf
+	api.Logger = log.Printf
 
 	api.UseSwaggerUI()
 	// To continue using redoc as your UI, uncomment the following line
@@ -38,11 +38,7 @@ func configureAPI(api *operations.APIAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	if api.AuthDataQueryAuthSubsDataHandler == nil {
-		api.AuthDataQueryAuthSubsDataHandler = auth_data.QueryAuthSubsDataHandlerFunc(func(params auth_data.QueryAuthSubsDataParams) middleware.Responder {
-			return middleware.NotImplemented("operation auth_data.QueryAuthSubsData has not yet been implemented")
-		})
-	}
+	api.AuthDataQueryAuthSubsDataHandler = auth_data.QueryAuthSubsDataHandlerFunc(controllers.QueryAuthSubsDataHandlerFunc)
 
 	api.PreServerShutdown = func() {}
 
